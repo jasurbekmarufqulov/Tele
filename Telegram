@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mening Ixtirom</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body { background-color: #242f3e; color: white; text-align: center; font-family: sans-serif; }
+        button { background: #3390ec; color: white; padding: 10px; border: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Salom, Telegram!</h1>
+    <p>Bu mening birinchi Web App loyiham.</p>
+    <button onclick="Telegram.WebApp.close()">Yopish</button>
+</body>
+</html>
