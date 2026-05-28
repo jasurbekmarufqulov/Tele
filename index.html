@@ -2,20 +2,361 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <title>Jasurbekning Portfoliosi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aviator Mobil Simulyatori</title>
     <style>
-        body { font-family: sans-serif; background-color: #f0f2f5; text-align: center; padding: 50px; }
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block; }
-        h1 { color: #0088cc; }
-        .btn { background: #0088cc; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: #1c1c1e;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .main-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        /* O'YIN MAYDONI */
+        .game-container {
+            background-color: #2c2c2e;
+            border-radius: 16px;
+            padding: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            border: 2px solid #3a3a3c;
+        }
+
+        .history-container {
+            display: flex;
+            gap: 8px;
+            background-color: #151517;
+            padding: 8px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            overflow-x: auto;
+            min-height: 40px;
+        }
+
+        .history-item {
+            font-size: 12px;
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        .coef-low { background-color: rgba(52, 152, 219, 0.2); color: #3498db; border: 1px solid #3498db; }
+        .coef-high { background-color: rgba(155, 89, 182, 0.2); color: #9b59b6; border: 1px solid #9b59b6; }
+
+        .display-area {
+            background-color: #151517;
+            height: 200px;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #48484a;
+        }
+
+        .multiplier { font-size: 42px; font-weight: bold; z-index: 10; }
+        .flew-away-text { color: #ff453a; font-size: 28px; font-weight: bold; display: none; z-index: 11; }
+        
+        .airplane {
+            position: absolute;
+            left: 10%;
+            bottom: 10%;
+            font-size: 26px;
+            transform: rotate(-15deg);
+            display: none;
+            z-index: 5;
+        }
+
+        .control-panel { margin-top: 15px; display: flex; flex-direction: column; gap: 12px; }
+        
+        /* STATUS BAR VA BALANSNI TO'LDIRISH TUGMASI */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #3a3a3c;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .deposit-btn {
+            background-color: #30d158;
+            color: black;
+            border: none;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .deposit-btn:active {
+            background-color: #249d41;
+        }
+
+        .balance-text span, .win-text span { color: #30d158; font-weight: bold; }
+
+        .btn { width: 100%; padding: 14px; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; }
+        .btn-start { background-color: #e01e37; color: white; }
+        .btn-cashout { background-color: #30d158; color: black; display: none; }
+
+        .grid-lines {
+            position: absolute; width: 100%; height: 100%;
+            background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* PASTDAGI PANEL: ISHTIROKCHILAR RO'YXATI */
+        .players-panel {
+            background-color: #2c2c2e;
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid #3a3a3c;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-title {
+            font-size: 13px;
+            font-weight: bold;
+            color: #aaa;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .players-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .player-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #151517;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        .player-row.cashed-out {
+            background-color: rgba(48, 209, 88, 0.12);
+            border: 1px solid #30d158;
+        }
+
+        .player-name { font-weight: bold; color: #fff; }
+        .player-bet { color: #ffb302; }
+        .player-win { color: #30d158; font-weight: bold; display: none; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h1>Salom, men Ixtirochiman!</h1>
-        <p>GitHub va Quyosh panellari ustida ishlayapman.</p>
-        <br>
-        <a href="https://t.me/jasurbekmarufqulov" class="btn">Telegram orqali bog'lanish</a>
+
+    <div class="main-layout">
+        
+        <div class="game-container">
+            <div class="history-container" id="historyBox">
+                <div class="history-item coef-low">1.45x</div>
+                <div class="history-item coef-high">2.10x</div>
+                <div class="history-item coef-low">1.18x</div>
+            </div>
+
+            <div class="display-area">
+                <div class="grid-lines"></div>
+                <div class="multiplier" id="multiplierText">1.00x</div>
+                <div class="flew-away-text" id="flewAwayText">FLEW AWAY!</div>
+                <div class="airplane" id="airplaneImg">✈️</div>
+            </div>
+
+            <div class="control-panel">
+                <div class="status-bar">
+                    <div class="balance-text">
+                        <button class="deposit-btn" onclick="refillBalance()">Balansni to'ldirish (+)</button> <br>
+                        Balans: <span id="balanceVal">5000</span> UZS
+                    </div>
+                    <div class="win-text">Yutuq: <span id="winVal">0</span> UZS</div>
+                </div>
+                <button class="btn btn-start" id="mainBtn" onclick="startRound()">TIKISH (1000 UZS)</button>
+            </div>
+        </div>
+
+        <div class="players-panel">
+            <div class="panel-title">
+                <span>Jonli Tikishlar (Boshqa o'yinchilar)</span>
+                <span id="totalBetsCount">O'yinchilar: 5</span>
+            </div>
+            <div class="players-list" id="playersList">
+                </div>
+        </div>
+
     </div>
+
+    <script>
+        let balance = 5000; // Boshlang'ich balans 5000 so'm qilindi
+        let currentMultiplier = 1.00;
+        let gameInterval;
+        let crashMultiplier;
+        let isPlaying = false;
+        const betAmount = 1000;
+
+        const sampleNames = ["Jasur_07", "Sardor_A", "Muzaffar", "Bekzod", "Anvar_99", "Diyor_7", "Umida_R", "Shahzod", "Olim_94", "Bobur_Uz"];
+        let activePlayers = [];
+
+        const multiplierText = document.getElementById('multiplierText');
+        const flewAwayText = document.getElementById('flewAwayText');
+        const airplaneImg = document.getElementById('airplaneImg');
+        const mainBtn = document.getElementById('mainBtn');
+        const balanceVal = document.getElementById('balanceVal');
+        const winVal = document.getElementById('winVal');
+        const historyBox = document.getElementById('historyBox');
+        const playersList = document.getElementById('playersList');
+
+        // BALANS TO'LDIRISH FUNKSIYASI
+        function refillBalance() {
+            balance += 5000; // Har bosganda 5000 so'm qo'shadi
+            balanceVal.innerText = balance;
+        }
+
+        function generateCrashPoint() {
+            let rand = Math.random(); 
+            if (rand < 0.10) return parseFloat((1.00 + Math.random() * 0.05).toFixed(2));
+            if (rand < 0.60) return parseFloat((1.06 + Math.random() * 1.44).toFixed(2));
+            if (rand < 0.90) return parseFloat((2.51 + Math.random() * 7.49).toFixed(2));
+            return parseFloat((10.01 + Math.random() * 30.00).toFixed(2));
+        }
+
+        function setupLivePlayers() {
+            playersList.innerHTML = "";
+            activePlayers = [];
+            
+            let shuffled = sampleNames.sort(() => 0.5 - Math.random()).slice(0, 5);
+            
+            shuffled.forEach((name, index) => {
+                let pBet = Math.floor(Math.random() * 4 + 1) * 2000;
+                let pTarget = parseFloat((1.1 + Math.random() * 3.5).toFixed(2)); 
+                
+                activePlayers.push({ id: index, name: name, bet: pBet, target: pTarget, cashedOut: false });
+
+                playersList.innerHTML += `
+                    <div class="player-row" id="p_row_${index}">
+                        <span class="player-name">${name}</span>
+                        <span class="player-bet" id="p_bet_${index}">${pBet} UZS</span>
+                        <span class="player-win" id="p_win_${index}">0 UZS</span>
+                    </div>
+                `;
+            });
+        }
+
+        function startRound() {
+            if (isPlaying) return;
+            if (balance < betAmount) { alert("Mablag' yetarli emas! Balansni to'ldiring."); return; }
+
+            balance -= betAmount;
+            balanceVal.innerText = balance;
+            isPlaying = true;
+            currentMultiplier = 1.00;
+            crashMultiplier = generateCrashPoint();
+            
+            setupLivePlayers();
+
+            flewAwayText.style.display = 'none';
+            multiplierText.style.display = 'block';
+            multiplierText.style.color = 'white';
+            airplaneImg.style.display = 'block';
+            airplaneImg.style.left = '10%'; airplaneImg.style.bottom = '10%';
+            
+            mainBtn.innerText = "CASH OUT (0 UZS)";
+            mainBtn.className = "btn btn-cashout";
+            mainBtn.style.display = "block";
+            mainBtn.setAttribute("onclick", "cashOut()");
+
+            gameInterval = setInterval(() => {
+                let speed = 0.01 + (currentMultiplier * 0.0015);
+                currentMultiplier += speed;
+                multiplierText.innerText = currentMultiplier.toFixed(2) + "x";
+
+                let currentLeft = parseFloat(airplaneImg.style.left);
+                let currentBottom = parseFloat(airplaneImg.style.bottom);
+                if (currentLeft < 75) airplaneImg.style.left = (currentLeft + 0.25) + "%";
+                if (currentBottom < 65) airplaneImg.style.bottom = (currentBottom + 0.2) + "%";
+
+                let currentWin = Math.round(betAmount * currentMultiplier);
+                mainBtn.innerText = `CASH OUT (${currentWin} UZS)`;
+
+                activePlayers.forEach(p => {
+                    if (!p.cashedOut && currentMultiplier >= p.target && currentMultiplier < crashMultiplier) {
+                        p.cashedOut = true;
+                        let totalWin = Math.round(p.bet * p.target);
+                        
+                        let rowElement = document.getElementById(`p_row_${p.id}`);
+                        let betElement = document.getElementById(`p_bet_${p.id}`);
+                        let winElement = document.getElementById(`p_win_${p.id}`);
+                        
+                        rowElement.className = "player-row cashed-out";
+                        betElement.innerText = p.target.toFixed(2) + "x";
+                        winElement.innerText = "+" + totalWin + " UZS";
+                        winElement.style.display = "block";
+                    }
+                });
+
+                if (currentMultiplier >= crashMultiplier) { endRound(false); }
+            }, 40);
+        }
+
+        function cashOut() { if (!isPlaying) return; endRound(true); }
+
+        function addResultToHistory(finalCoef) {
+            const newItem = document.createElement('div');
+            newItem.innerText = finalCoef.toFixed(2) + "x";
+            newItem.className = finalCoef >= 2.00 ? "history-item coef-high" : "history-item coef-low";
+            historyBox.insertBefore(newItem, historyBox.firstChild);
+            if (historyBox.children.length > 5) historyBox.removeChild(historyBox.lastChild);
+        }
+
+        function endRound(isWin) {
+            clearInterval(gameInterval);
+            isPlaying = false;
+            airplaneImg.style.display = 'none';
+
+            addResultToHistory(currentMultiplier);
+
+            if (isWin) {
+                let winAmount = Math.round(betAmount * currentMultiplier);
+                balance += winAmount; balanceVal.innerText = balance; winVal.innerText = winAmount;
+                multiplierText.style.color = '#30d158';
+            } else {
+                multiplierText.style.display = 'none'; flewAwayText.style.display = 'block'; winVal.innerText = 0;
+            }
+
+            setTimeout(() => {
+                mainBtn.innerText = `TIKISH (${betAmount} UZS)`;
+                mainBtn.className = "btn btn-start";
+                mainBtn.setAttribute("onclick", "startRound()");
+            }, 1200);
+        }
+    </script>
 </body>
 </html>
