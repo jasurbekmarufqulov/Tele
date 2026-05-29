@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aviator Mobil Simulyatori</title>
+    <title>Aviator Tabiat Manzarasi Simulyatori</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,7 @@
         }
 
         body {
-            background-color: #1c1c1e;
+            background-color: #121214;
             color: white;
             display: flex;
             justify-content: center;
@@ -30,19 +30,18 @@
             max-width: 500px;
         }
 
-        /* O'YIN MAYDONI */
         .game-container {
-            background-color: #2c2c2e;
+            background-color: #222226;
             border-radius: 16px;
             padding: 15px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-            border: 2px solid #3a3a3c;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            border: 1px solid #2f2f35;
         }
 
         .history-container {
             display: flex;
             gap: 8px;
-            background-color: #151517;
+            background-color: #16161a;
             padding: 8px;
             border-radius: 8px;
             margin-bottom: 12px;
@@ -60,78 +59,137 @@
         .coef-low { background-color: rgba(52, 152, 219, 0.2); color: #3498db; border: 1px solid #3498db; }
         .coef-high { background-color: rgba(155, 89, 182, 0.2); color: #9b59b6; border: 1px solid #9b59b6; }
 
+        /* TABIIY MANZARALI O'YIN EKRANI */
         .display-area {
-            background-color: #151517;
-            height: 200px;
+            /* Quyosh botayotgan tabiiy ufq ranglari (Sunset Sky) */
+            background: linear-gradient(to bottom, #1f1c2c, #402540, #923cb5, #e65c00);
+            height: 230px;
             border-radius: 12px;
             position: relative;
             overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
-            border: 1px solid #48484a;
+            border: 1px solid #444;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
         }
 
-        .multiplier { font-size: 42px; font-weight: bold; z-index: 10; }
-        .flew-away-text { color: #ff453a; font-size: 28px; font-weight: bold; display: none; z-index: 11; }
+        /* Quyosh shulasi */
+        .sun-glow {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(255,200,0,0.4) 0%, transparent 70%);
+            z-index: 1;
+        }
+
+        /* Uzoqdagi tabiiy tog'lar */
+        .natural-mountains {
+            position: absolute;
+            bottom: 0;
+            width: 200%;
+            height: 60px;
+            background-image: 
+                linear-gradient(115deg, #1d1128 30%, transparent 30%),
+                linear-gradient(245deg, #231530 35%, transparent 35%);
+            background-size: 120px 100%;
+            background-repeat: repeat-x;
+            opacity: 0.9;
+            z-index: 2;
+            animation: moveLandscape 15s linear infinite;
+            animation-play-state: paused;
+        }
+
+        /* Orqa plandagi uzoq bulutlar (Sekin harakatlanadi) */
+        .clouds-bg {
+            position: absolute;
+            width: 200%;
+            height: 70px;
+            top: 30px;
+            background: radial-gradient(circle at 10% 40%, rgba(255,255,255,0.06) 20px, transparent 40px),
+                        radial-gradient(circle at 40% 50%, rgba(255,255,255,0.08) 35px, transparent 60px),
+                        radial-gradient(circle at 75% 30%, rgba(255,255,255,0.05) 25px, transparent 50px);
+            background-size: 400px 70px;
+            z-index: 1;
+            animation: moveLandscape 25s linear infinite;
+            animation-play-state: paused;
+        }
+
+        /* Old plandagi yaqin bulutlar (Tezroq harakatlanadi) */
+        .clouds-fg {
+            position: absolute;
+            width: 200%;
+            height: 50px;
+            bottom: 15px;
+            background: radial-gradient(circle at 20% 90%, rgba(255,255,255,0.1) 25px, transparent 50px),
+                        radial-gradient(circle at 60% 80%, rgba(255,255,255,0.12) 40px, transparent 70px),
+                        radial-gradient(circle at 90% 90%, rgba(255,255,255,0.09) 30px, transparent 55px);
+            background-size: 300px 50px;
+            z-index: 3;
+            opacity: 0.85;
+            animation: moveLandscape 8s linear infinite;
+            animation-play-state: paused;
+        }
+
+        /* Manzara va bulutlar siljishi uchun animatsiya */
+        @keyframes moveLandscape {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+
+        .multiplier { font-size: 46px; font-weight: bold; z-index: 10; text-shadow: 3px 3px 12px rgba(0,0,0,0.9); }
+        .flew-away-text { color: #ff453a; font-size: 32px; font-weight: bold; display: none; z-index: 11; text-shadow: 2px 2px 10px rgba(0,0,0,0.9); }
         
         .airplane {
             position: absolute;
             left: 10%;
-            bottom: 10%;
-            font-size: 26px;
-            transform: rotate(-15deg);
+            bottom: 20%;
+            font-size: 35px;
+            transform: rotate(-8deg);
             display: none;
             z-index: 5;
+            filter: drop-shadow(3px 5px 6px rgba(0,0,0,0.5));
         }
 
         .control-panel { margin-top: 15px; display: flex; flex-direction: column; gap: 12px; }
         
-        /* STATUS BAR VA BALANSNI TO'LDIRISH TUGMASI */
         .status-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #3a3a3c;
+            background: #2b2b30;
             padding: 10px 12px;
             border-radius: 8px;
             font-size: 14px;
+            border: 1px solid #333;
         }
 
         .deposit-btn {
             background-color: #30d158;
             color: black;
             border: none;
-            padding: 4px 10px;
+            padding: 5px 12px;
             font-size: 11px;
             font-weight: bold;
             border-radius: 4px;
             cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .deposit-btn:active {
-            background-color: #249d41;
         }
 
         .balance-text span, .win-text span { color: #30d158; font-weight: bold; }
 
-        .btn { width: 100%; padding: 14px; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; }
-        .btn-start { background-color: #e01e37; color: white; }
-        .btn-cashout { background-color: #30d158; color: black; display: none; }
+        .btn { width: 100%; padding: 14px; font-size: 17px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; }
+        .btn-start { background-color: #e01e37; color: white; box-shadow: 0 4px 15px rgba(224,30,55,0.4); }
+        .btn-cashout { background-color: #30d158; color: black; display: none; box-shadow: 0 4px 15px rgba(48,209,88,0.4); }
 
-        .grid-lines {
-            position: absolute; width: 100%; height: 100%;
-            background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
-
-        /* PASTDAGI PANEL: ISHTIROKCHILAR RO'YXATI */
+        /* JONLI ISHTIROKCHILAR PANELI */
         .players-panel {
-            background-color: #2c2c2e;
+            background-color: #222226;
             border-radius: 12px;
             padding: 15px;
-            border: 1px solid #3a3a3c;
+            border: 1px solid #2f2f35;
             display: flex;
             flex-direction: column;
         }
@@ -139,7 +197,7 @@
         .panel-title {
             font-size: 13px;
             font-weight: bold;
-            color: #aaa;
+            color: #8e8e93;
             margin-bottom: 10px;
             display: flex;
             justify-content: space-between;
@@ -149,7 +207,7 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
-            max-height: 200px;
+            max-height: 180px;
             overflow-y: auto;
         }
 
@@ -157,14 +215,15 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: #151517;
+            background-color: #16161a;
             padding: 8px 12px;
             border-radius: 6px;
             font-size: 12px;
+            border: 1px solid #1f1f23;
         }
 
         .player-row.cashed-out {
-            background-color: rgba(48, 209, 88, 0.12);
+            background-color: rgba(48, 209, 88, 0.1);
             border: 1px solid #30d158;
         }
 
@@ -179,13 +238,17 @@
         
         <div class="game-container">
             <div class="history-container" id="historyBox">
-                <div class="history-item coef-low">1.45x</div>
-                <div class="history-item coef-high">2.10x</div>
-                <div class="history-item coef-low">1.18x</div>
+                <div class="history-item coef-low">1.64x</div>
+                <div class="history-item coef-high">2.45x</div>
+                <div class="history-item coef-low">1.08x</div>
             </div>
 
             <div class="display-area">
-                <div class="grid-lines"></div>
+                <div class="sun-glow"></div>
+                <div class="clouds-bg" id="cloudsBg"></div>
+                <div class="natural-mountains" id="naturalMountains"></div>
+                <div class="clouds-fg" id="cloudsFg"></div>
+                
                 <div class="multiplier" id="multiplierText">1.00x</div>
                 <div class="flew-away-text" id="flewAwayText">FLEW AWAY!</div>
                 <div class="airplane" id="airplaneImg">✈️</div>
@@ -206,16 +269,15 @@
         <div class="players-panel">
             <div class="panel-title">
                 <span>Jonli Tikishlar (Boshqa o'yinchilar)</span>
-                <span id="totalBetsCount">O'yinchilar: 5</span>
+                <span>O'yinchilar: 5</span>
             </div>
-            <div class="players-list" id="playersList">
-                </div>
+            <div class="players-list" id="playersList"></div>
         </div>
 
     </div>
 
     <script>
-        let balance = 5000; // Boshlang'ich balans 5000 so'm qilindi
+        let balance = 5000;
         let currentMultiplier = 1.00;
         let gameInterval;
         let crashMultiplier;
@@ -233,31 +295,33 @@
         const winVal = document.getElementById('winVal');
         const historyBox = document.getElementById('historyBox');
         const playersList = document.getElementById('playersList');
+        
+        // Tabiat foni elementlari
+        const cloudsBg = document.getElementById('cloudsBg');
+        const naturalMountains = document.getElementById('naturalMountains');
+        const cloudsFg = document.getElementById('cloudsFg');
 
-        // BALANS TO'LDIRISH FUNKSIYASI
         function refillBalance() {
-            balance += 5000; // Har bosganda 5000 so'm qo'shadi
+            balance += 5000;
             balanceVal.innerText = balance;
         }
 
         function generateCrashPoint() {
             let rand = Math.random(); 
-            if (rand < 0.10) return parseFloat((1.00 + Math.random() * 0.05).toFixed(2));
-            if (rand < 0.60) return parseFloat((1.06 + Math.random() * 1.44).toFixed(2));
-            if (rand < 0.90) return parseFloat((2.51 + Math.random() * 7.49).toFixed(2));
-            return parseFloat((10.01 + Math.random() * 30.00).toFixed(2));
+            if (rand < 0.12) return parseFloat((1.00 + Math.random() * 0.05).toFixed(2));
+            if (rand < 0.65) return parseFloat((1.06 + Math.random() * 1.44).toFixed(2));
+            if (rand < 0.90) return parseFloat((2.51 + Math.random() * 6.49).toFixed(2));
+            return parseFloat((10.01 + Math.random() * 25.00).toFixed(2));
         }
 
         function setupLivePlayers() {
             playersList.innerHTML = "";
             activePlayers = [];
-            
             let shuffled = sampleNames.sort(() => 0.5 - Math.random()).slice(0, 5);
             
             shuffled.forEach((name, index) => {
                 let pBet = Math.floor(Math.random() * 4 + 1) * 2000;
                 let pTarget = parseFloat((1.1 + Math.random() * 3.5).toFixed(2)); 
-                
                 activePlayers.push({ id: index, name: name, bet: pBet, target: pTarget, cashedOut: false });
 
                 playersList.innerHTML += `
@@ -286,22 +350,27 @@
             multiplierText.style.display = 'block';
             multiplierText.style.color = 'white';
             airplaneImg.style.display = 'block';
-            airplaneImg.style.left = '10%'; airplaneImg.style.bottom = '10%';
+            airplaneImg.style.left = '10%'; airplaneImg.style.bottom = '20%';
             
+            // Tabiat elementlari harakatini boshlash (Parallaks)
+            cloudsBg.style.animationPlayState = 'running';
+            naturalMountains.style.animationPlayState = 'running';
+            cloudsFg.style.animationPlayState = 'running';
+
             mainBtn.innerText = "CASH OUT (0 UZS)";
             mainBtn.className = "btn btn-cashout";
             mainBtn.style.display = "block";
             mainBtn.setAttribute("onclick", "cashOut()");
 
             gameInterval = setInterval(() => {
-                let speed = 0.01 + (currentMultiplier * 0.0015);
+                let speed = 0.01 + (currentMultiplier * 0.0012);
                 currentMultiplier += speed;
                 multiplierText.innerText = currentMultiplier.toFixed(2) + "x";
 
                 let currentLeft = parseFloat(airplaneImg.style.left);
                 let currentBottom = parseFloat(airplaneImg.style.bottom);
-                if (currentLeft < 75) airplaneImg.style.left = (currentLeft + 0.25) + "%";
-                if (currentBottom < 65) airplaneImg.style.bottom = (currentBottom + 0.2) + "%";
+                if (currentLeft < 68) airplaneImg.style.left = (currentLeft + 0.18) + "%";
+                if (currentBottom < 58) airplaneImg.style.bottom = (currentBottom + 0.13) + "%";
 
                 let currentWin = Math.round(betAmount * currentMultiplier);
                 mainBtn.innerText = `CASH OUT (${currentWin} UZS)`;
@@ -310,15 +379,11 @@
                     if (!p.cashedOut && currentMultiplier >= p.target && currentMultiplier < crashMultiplier) {
                         p.cashedOut = true;
                         let totalWin = Math.round(p.bet * p.target);
-                        
-                        let rowElement = document.getElementById(`p_row_${p.id}`);
-                        let betElement = document.getElementById(`p_bet_${p.id}`);
-                        let winElement = document.getElementById(`p_win_${p.id}`);
-                        
-                        rowElement.className = "player-row cashed-out";
-                        betElement.innerText = p.target.toFixed(2) + "x";
-                        winElement.innerText = "+" + totalWin + " UZS";
-                        winElement.style.display = "block";
+                        document.getElementById(`p_row_${p.id}`).className = "player-row cashed-out";
+                        document.getElementById(`p_bet_${p.id}`).innerText = p.target.toFixed(2) + "x";
+                        let winEl = document.getElementById(`p_win_${p.id}`);
+                        winEl.innerText = "+" + totalWin + " UZS";
+                        winEl.style.display = "block";
                     }
                 });
 
@@ -340,6 +405,11 @@
             clearInterval(gameInterval);
             isPlaying = false;
             airplaneImg.style.display = 'none';
+
+            // Samolyot to'xtaganda tabiat harakatini ham to'xtatish
+            cloudsBg.style.animationPlayState = 'paused';
+            naturalMountains.style.animationPlayState = 'paused';
+            cloudsFg.style.animationPlayState = 'paused';
 
             addResultToHistory(currentMultiplier);
 
