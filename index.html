@@ -3,520 +3,359 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rich Toad - Nahang Hujumi</title>
+    <title>Uzum Market - Yonma-yon Ko'rinish</title>
     <style>
+        /* CSS: Yonma-yon joylashtirish va Mukammal dizayn */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background-color: #050b14;
+            background-color: #f2f4f7;
+            color: #1f1f1f;
+        }
+
+        header {
+            background-color: #7000ff;
             color: white;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            padding: 10px;
+            padding: 15px 5%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
-        .main-layout {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            width: 100%;
-            max-width: 480px;
-        }
-
-        .game-container {
-            background-color: #0f1926;
-            border-radius: 16px;
-            padding: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            border: 2px solid #1d2d44;
-        }
-
-        /* KOEFFITSIYENTLAR TARIXI */
-        .history-container {
-            display: flex;
-            gap: 6px;
-            background-color: #03070d;
-            padding: 8px;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            overflow-x: auto;
-            min-height: 38px;
-        }
-
-        .history-item {
-            font-size: 11px;
-            font-weight: bold;
-            padding: 3px 8px;
-            border-radius: 12px;
-        }
-        .coef-low { background-color: rgba(52, 152, 219, 0.2); color: #3498db; border: 1px solid #3498db; }
-        .coef-high { background-color: rgba(241, 196, 15, 0.2); color: #f1c40f; border: 1px solid #f1c40f; }
-
-        .center-multiplier {
-            position: absolute;
-            top: 15px;
-            font-size: 38px;
-            font-weight: bold;
-            color: #fff;
-            z-index: 10;
-            text-shadow: 2px 2px 8px rgba(0,0,0,0.9);
-        }
-
-        /* KO'K SUV HUDUDI */
-        .display-area {
-            background: linear-gradient(to bottom, #0a2540, #114066, #1b6ca8, #3a9ad9); 
-            height: 320px;
-            border-radius: 12px;
-            position: relative;
-            overflow: hidden;
-            border: 2px solid #235e8f;
-            box-shadow: inset 0 0 30px rgba(0,0,0,0.7);
-            display: flex;
-            justify-content: center;
-        }
-
-        /* ORQA FONDA SUZUVCHI BALIQCHALAR */
-        .fish {
-            position: absolute;
-            font-size: 18px;
-            z-index: 1;
-            opacity: 0.6;
-            pointer-events: none;
-        }
-
-        .fish-left {
-            animation: swimLeftToRight 8s linear infinite;
-        }
-
-        .fish-right {
-            animation: swimRightToLeft 10s linear infinite;
-        }
-
-        @keyframes swimLeftToRight {
-            0% { left: -40px; transform: scaleX(1); }
-            100% { left: 100%; transform: scaleX(1); }
-        }
-
-        @keyframes swimRightToLeft {
-            0% { right: -40px; transform: scaleX(-1); }
-            100% { right: 100%; transform: scaleX(-1); }
-        }
-
-        /* TOSHLAR KONTEYNERI */
-        .stones-container {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            bottom: 0;
-            z-index: 2;
-            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-
-        /* JIGARRANG TOSHLAR */
-        .stone-node {
-            position: absolute;
-            width: 90px;
-            height: 52px;
-            background: linear-gradient(135deg, #8b5a2b 0%, #5c3a21 100%);
-            border-radius: 40% 40% 50% 50%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            border: 3px solid #a06d3b;
-            box-shadow: 0 8px 14px rgba(0,0,0,0.6), inset 0 4px 6px rgba(255,255,255,0.2);
-            left: calc(50% - 45px); 
-            transition: transform 0.2s, background 0.3s;
-        }
-
-        .stone-node.active {
-            background: linear-gradient(135deg, #b07d4f 0%, #784b2c 100%);
-            border-color: #e5a96f;
-            box-shadow: 0 0 20px rgba(229,169,111,0.6), 0 8px 14px rgba(0,0,0,0.6);
-        }
-
-        .stone-coef {
-            font-size: 14px;
-            font-weight: 900;
-            color: #ffffff;
-            text-shadow: 2px 2px 4px rgba(0,0,0,1);
-        }
-
-        /* BAQACHA */
-        .frog-player {
-            position: absolute;
-            font-size: 45px;
-            z-index: 5;
-            left: calc(50% - 22.5px);
-            bottom: 22px; 
-            transition: bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), transform 0.2s;
-            filter: drop-shadow(0 8px 6px rgba(0,0,0,0.6));
-        }
-
-        /* DAXSHATLI NAHANG (SHARK) */
-        .shark-enemy {
-            position: absolute;
-            font-size: 65px;
-            z-index: 6; /* Baqachaning ustidan chiqadi */
-            left: calc(50% - 32.5px);
-            bottom: -100px; /* O'yin paytida ko'rinmaydi, pastda turadi */
-            transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15);
-            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.7));
-            pointer-events: none;
-        }
-
-        .status-text {
-            position: absolute;
-            font-size: 22px;
-            font-weight: bold;
-            color: #ff453a;
-            display: none;
-            z-index: 11;
-            top: 45%;
-            text-shadow: 2px 2px 8px rgba(0,0,0,0.9);
-            text-align: center;
-        }
-
-        /* BOSHQARUV PANELI */
-        .control-panel { margin-top: 15px; display: flex; flex-direction: column; gap: 12px; }
-        
-        .status-bar {
+        .header-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #14243b;
-            padding: 10px 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            border: 1px solid #20395e;
+            max-width: 1300px;
+            margin: 0 auto;
+            width: 100%;
         }
 
-        .deposit-btn {
-            background-color: #3498db;
+        .logo-section {
+            font-size: 26px;
+            font-weight: bold;
+        }
+
+        .logo-section span {
+            color: #ffe600;
+        }
+
+        .cart-btn {
+            background-color: white;
+            color: #7000ff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 25px auto;
+            padding: 0 15px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            margin-bottom: 20px;
+            border-left: 5px solid #7000ff;
+            padding-left: 10px;
+        }
+
+        /* 🟢 ENG MUHIM QISM: Mahsulotlarni yonma-yon chiqarish (Grid) */
+        .products-grid {
+            display: grid;
+            /* Kompyuter ekranida kamida 5 ta mahsulot yonma-yon turadi */
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px; /* Mahsulotlar orasidagi masofa */
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 18px rgba(112,0,255,0.12);
+        }
+
+        .image-wrapper {
+            width: 100%;
+            height: 190px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .product-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .product-title {
+            font-size: 13.5px;
+            color: #333;
+            line-height: 1.35;
+            height: 38px;
+            overflow: hidden;
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .price-wrapper {
+            margin-bottom: 10px;
+        }
+
+        .old-price {
+            font-size: 11px;
+            color: #757575;
+            text-decoration: line-through;
+        }
+
+        .product-price {
+            font-size: 15.5px;
+            font-weight: bold;
+            color: #1f1f1f;
+        }
+
+        .add-to-cart {
+            background-color: #7000ff;
             color: white;
             border: none;
-            padding: 5px 12px;
-            font-size: 11px;
+            padding: 9px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
             font-weight: bold;
-            border-radius: 4px;
+            font-size: 13px;
+            transition: 0.2s;
+        }
+
+        .add-to-cart:hover {
+            background-color: #5500cc;
+        }
+
+        /* Mobil qurilmalar uchun moslashtirish (Responsive) */
+        @media (max-width: 600px) {
+            .products-grid {
+                /* Telefonlarda yonma-yon to'liq 2 tadan bo'lib joylashadi */
+                grid-template-columns: repeat(2, 1fr); 
+                gap: 10px;
+            }
+            .image-wrapper {
+                height: 150px; /* Telefon ekranida rasm biroz kichrayadi */
+            }
+            .product-price {
+                font-size: 14px;
+            }
+        }
+
+        /* Savatcha Oynasi (Modal) */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 2000; 
+            left: 0; top: 0;
+            width: 100%; height: 100%; 
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 12% auto;
+            padding: 30px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 480px;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            right: 20px; top: 15px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #aaa;
+        }
+
+        .cart-items-container {
+            max-height: 220px;
+            overflow-y: auto;
+            margin: 15px 0;
+        }
+
+        .cart-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        .total-price {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 15px 0;
+            text-align: right;
+        }
+
+        .order-btn {
+            background-color: #00cc66;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            width: 100%;
+            font-weight: bold;
+            font-size: 16px;
             cursor: pointer;
         }
-
-        .balance-text span, .win-text span { color: #3498db; font-weight: bold; }
-
-        .btn { width: 100%; padding: 14px; font-size: 17px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; }
-        .btn-start { background-color: #3498db; color: white; box-shadow: 0 4px 15px rgba(52,152,219,0.3); }
-        .btn-cashout { background-color: #f1c40f; color: black; display: none; box-shadow: 0 4px 15px rgba(241,196,15,0.3); }
-
-        /* JONLI ISHTIROKCHILAR */
-        .players-panel {
-            background-color: #0f1926;
-            border-radius: 12px;
-            padding: 15px;
-            border: 1px solid #1d2d44;
-        }
-
-        .panel-title {
-            font-size: 12px;
-            font-weight: bold;
-            color: #708aa6;
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .players-list { display: flex; flex-direction: column; gap: 6px; max-height: 120px; overflow-y: auto; }
-        
-        .player-row {
-            display: flex; justify-content: space-between; align-items: center;
-            background-color: #060c14; padding: 8px 12px; border-radius: 6px; font-size: 12px;
-        }
-        .player-row.cashed-out { background-color: rgba(46, 204, 113, 0.12); border: 1px solid #2ecc71; }
-        .player-name { font-weight: bold; color: #fff; }
-        .player-bet { color: #ffb302; }
-        .player-win { color: #2ecc71; font-weight: bold; display: none; }
     </style>
 </head>
 <body>
 
-    <div class="main-layout">
+    <header>
+        <div class="header-container">
+            <div class="logo-section">Uzum <span>Market</span></div>
+            <div>
+                <button class="cart-btn" onclick="modalniOch()">
+                    🛒 Savatcha (<span id="cart-count">0</span>)
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2 class="section-title">Hafta xitlari — Yonma-yon katalog</h2>
         
-        <div class="game-container">
-            <div class="history-container" id="historyBox">
-                <div class="history-item coef-low">1.65x</div>
-                <div class="history-item coef-high">4.20x</div>
-            </div>
+        <div class="products-grid" id="market-products"></div>
+    </div>
 
-            <!-- JONLI KO'K MAYDON -->
-            <div class="display-area" id="displayArea">
-                <!-- Baliqchalar (Avtomatik suzib yuradi) -->
-                <div class="fish fish-left" style="top: 40px;">🐟</div>
-                <div class="fish fish-right" style="top: 100px;">🐠</div>
-                <div class="fish fish-left" style="top: 180px;">🐡</div>
-                <div class="fish fish-right" style="top: 240px;">✨🐠</div>
-
-                <div class="center-multiplier" id="multiplierText">1.00x</div>
-                <div class="status-text" id="statusText">NAHANG HUJUMI! 🦈☠️</div>
-                
-                <div class="stones-container" id="stonesContainer"></div>
-                <div class="frog-player" id="frogPlayer">🐸</div>
-                
-                <!-- Maxfiy Nahang Balig'i -->
-                <div class="shark-enemy" id="sharkEnemy">🦈</div>
-            </div>
-
-            <div class="control-panel">
-                <div class="status-bar">
-                    <div class="balance-text">
-                        <button class="deposit-btn" onclick="refillBalance()">Balans (+)</button> <br>
-                        Balans: <span id="balanceVal">5000</span> UZS
-                    </div>
-                    <div class="win-text">Yutuq: <span id="winVal">0</span> UZS</div>
-                </div>
-                <button class="btn btn-start" id="mainBtn" onclick="startRound()">TIKISH (1000 UZS)</button>
-            </div>
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="modalniYop()">&times;</span>
+            <h3>Siz tanlagan mahsulotlar</h3>
+            <div class="cart-items-container" id="cart-items-list"></div>
+            <div class="total-price">Jami: <span id="total-sum">0</span> so'm</div>
+            <button class="order-btn" onclick="rasmiylashtirish()">Xaridni yakunlash</button>
         </div>
-
-        <div class="players-panel">
-            <div class="panel-title">
-                <span>Jonli Sakrashlar</span>
-                <span id="activeCountLabel">Faol: --</span>
-            </div>
-            <div class="players-list" id="playersList"></div>
-        </div>
-
     </div>
 
     <script>
-        let balance = 5000;
-        let currentMultiplier = 1.00;
-        let gameLoopInterval;
-        let crashMultiplier;
-        let isPlaying = false;
-        const betAmount = 1000;
-        
-        let currentStep = 0;
-        let totalSteps = 40; 
-        let stoneStepsData = []; 
+        // 30 ta mahsulot ma'lumotlar bazasi
+        const mahsulotlar = [
+            { id: 1, nomi: "Smartfon Redmi Note 13 Pro 256 GB", narxi: 3500000, eskiNarxi: 4200000, rasm: "http://googleusercontent.com/image_collection/image_retrieval/12779553750339755406_0" },
+            { id: 2, nomi: "Simsiz quloqchinlar AirPods Pro 2", narxi: 2400000, eskiNarxi: 2900000, rasm: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&q=80" },
+            { id: 3, nomi: "Erkaklar krossovkasi Nike Air Max", narxi: 850000, eskiNarxi: 1200000, rasm: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80" },
+            { id: 4, nomi: "Aqlli soat Mi Band 8 Active", narxi: 350000, eskiNarxi: 500000, rasm: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80" },
+            { id: 5, nomi: "Noutbuk ASUS Vivobook 15 i5", narxi: 7200000, eskiNarxi: 8000000, rasm: "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=400&q=80" },
+            { id: 6, nomi: "Mexanik klaviatura RGB Backlight", narxi: 450000, eskiNarxi: 600000, rasm: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400&q=80" },
+            { id: 7, nomi: "Simsiz sichqoncha Logitech G Pro", narxi: 680000, eskiNarxi: 800000, rasm: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=400&q=80" },
+            { id: 8, nomi: "Power Bank Xiaomi 20000 mAh", narxi: 280000, eskiNarxi: 350000, rasm: "https://images.unsplash.com/photo-1609592424109-dd9892f1b177?w=400&q=80" },
+            { id: 9, nomi: "Smart televizor Samsung 43 LDU", narxi: 4800000, eskiNarxi: 5500000, rasm: "https://images.unsplash.com/photo-1593305841991-05c297ba4575?w=400&q=80" },
+            { id: 10, nomi: "Kofe qaynatgich Philips Eco", narxi: 1100000, eskiNarxi: 1400000, rasm: "https://images.unsplash.com/photo-1517686469429-8faf88b9f7af?w=400&q=80" },
+            { id: 11, nomi: "Elektr choynak Tefal Glass 1.7L", narxi: 320000, eskiNarxi: 400000, rasm: "https://images.unsplash.com/photo-1574269909862-7e1d70bb8078?w=400&q=80" },
+            { id: 12, nomi: "Blender Braun Multiquick 5", narxi: 750000, eskiNarxi: 900000, rasm: "https://images.unsplash.com/photo-1578643463396-0997cb5328c1?w=400&q=80" },
+            { id: 13, nomi: "Erkaklar charm hamyoni Classic", narxi: 150000, eskiNarxi: 220000, rasm: "https://images.unsplash.com/photo-1627123424574-724758594e93?w=400&q=80" },
+            { id: 14, nomi: "Ayollar sumkachasi Shoulder Bag", narxi: 290000, eskiNarxi: 450000, rasm: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400&q=80" },
+            { id: 15, nomi: "Sport xaltasi (Ryukzak) Puma Pro", narxi: 240000, eskiNarxi: 350000, rasm: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&q=80" },
+            { id: 16, nomi: "Klassik mexanik erkaklar soati", narxi: 950000, eskiNarxi: 1300000, rasm: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=400&q=80" },
+            { id: 17, nomi: "Quyoshdan himoya ko'zoynagi RayBan", narxi: 180000, eskiNarxi: 280000, rasm: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=400&q=80" },
+            { id: 18, nomi: "Termos zanglamas po'lat 1L", narxi: 125000, eskiNarxi: 180000, rasm: "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=400&q=80" },
+            { id: 19, nomi: "Dasturxon bezash to'plami (Serviz)", narxi: 650000, eskiNarxi: 800000, rasm: "https://images.unsplash.com/photo-1610701596007-11502861affa?w=400&q=80" },
+            { id: 20, nomi: "Oshxona pichoqlari to'plami 6 ta", narxi: 190000, eskiNarxi: 270000, rasm: "https://images.unsplash.com/photo-1593616562584-370cc6c3f59b?w=400&q=80" },
+            { id: 21, nomi: "Simsiz kolonka JBL Flip 6", narxi: 1250000, eskiNarxi: 1500000, rasm: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400&q=80" },
+            { id: 22, nomi: "Videoregistrator 70mai Dash Cam", narxi: 580000, eskiNarxi: 700000, rasm: "https://images.unsplash.com/photo-1563206767-5b18f218e8de?w=400&q=80" },
+            { id: 23, nomi: "Avtomobil o'rindiq chexoli", narxi: 420000, eskiNarxi: 600000, rasm: "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=400&q=80" },
+            { id: 24, nomi: "Bolalar o'yinchoq mashinasi Lego", narxi: 135000, eskiNarxi: 200000, rasm: "https://images.unsplash.com/photo-1585366119957-e5733f3000d5?w=400&q=80" },
+            { id: 25, nomi: "Yuz parvarishi uchun namlovchi krem", narxi: 85000, eskiNarxi: 110000, rasm: "https://images.unsplash.com/photo-1608248597481-496100c8c836?w=400&q=80" },
+            { id: 26, nomi: "Professional fen soch uchun", narxi: 310000, eskiNarxi: 450000, rasm: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&q=80" },
+            { id: 27, nomi: "Fitnes mat (Gimnastika gilami)", narxi: 95000, eskiNarxi: 140000, rasm: "https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?w=400&q=80" },
+            { id: 28, nomi: "Gantellar to'plami 2 ta (5kg)", narxi: 180000, eskiNarxi: 240000, rasm: "https://images.unsplash.com/photo-1638536532686-d610adfc8e5c?w=400&q=80" },
+            { id: 29, nomi: "LED Stol chirog'i (Yoritgich)", narxi: 110000, eskiNarxi: 160000, rasm: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=400&q=80" },
+            { id: 30, nomi: "Ortopedik yotoq yostig'i", narxi: 220000, eskiNarxi: 300000, rasm: "https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=400&q=80" }
+        ];
 
-        const sampleNames = ["Jasur_07", "Sardor_A", "Muzaffar", "Bekzod", "Anvar_99", "Diyor_94", "Bobur_Uz", "Lazizbek"];
-        let activePlayers = [];
+        let savatcha = [];
 
-        const multiplierText = document.getElementById('multiplierText');
-        const statusText = document.getElementById('statusText');
-        const frogPlayer = document.getElementById('frogPlayer');
-        const sharkEnemy = document.getElementById('sharkEnemy');
-        const stonesContainer = document.getElementById('stonesContainer');
-        const mainBtn = document.getElementById('mainBtn');
-        const balanceVal = document.getElementById('balanceVal');
-        const winVal = document.getElementById('winVal');
-        const historyBox = document.getElementById('historyBox');
-        const playersList = document.getElementById('playersList');
-        const activeCountLabel = document.getElementById('activeCountLabel');
-
-        function refillBalance() {
-            balance += 5000;
-            balanceVal.innerText = balance;
-        }
-
-        function generateCrashPoint() {
-            let rand = Math.random();
-            if (rand < 0.15) return parseFloat((1.00 + Math.random() * 0.12).toFixed(2));
-            if (rand < 0.70) return parseFloat((1.15 + Math.random() * 2.2).toFixed(2));
-            return parseFloat((3.50 + Math.random() * 15.00).toFixed(2));
-        }
-
-        function generateStonesPattern() {
-            stonesContainer.innerHTML = "";
-            stoneStepsData = [];
-            let coef = 1.00;
-            stoneStepsData.push(1.00);
-            
-            for (let i = 1; i <= totalSteps; i++) {
-                coef += parseFloat((0.06 + (i * 0.008)).toFixed(2));
-                stoneStepsData.push(parseFloat(coef.toFixed(2)));
-            }
-
-            stoneStepsData.forEach((val, index) => {
-                let stone = document.createElement('div');
-                stone.className = "stone-node";
-                stone.id = `stone_${index}`;
-                stone.style.bottom = (index * 78) + 32 + "px"; 
-                stone.innerHTML = `<span class="stone-coef">${val.toFixed(2)}x</span>`;
-                stonesContainer.appendChild(stone);
-            });
-            
-            document.getElementById('stone_0').className = "stone-node active";
-        }
-
-        function renderPlayersList() {
-            playersList.innerHTML = "";
-            let livingCount = 0;
-
-            activePlayers.forEach(p => {
-                if (!p.cashedOut) livingCount++;
-                let rowClass = p.cashedOut ? "player-row cashed-out" : "player-row";
-                let betDisplay = p.cashedOut ? `${p.target.toFixed(2)}x` : `${p.bet} UZS`;
-                let winDisplay = p.cashedOut ? `block` : `none`;
-                let totalWin = Math.round(p.bet * p.target);
-
-                playersList.innerHTML += `
-                    <div class="${rowClass}">
-                        <span class="player-name">${p.name}</span>
-                        <span class="player-bet">${betDisplay}</span>
-                        <span class="player-win" style="display: ${winDisplay}">+${totalWin} UZS</span>
+        // Mahsulotlarni yonma-yon chiqarish mantiqi
+        const grid = document.getElementById('market-products');
+        mahsulotlar.forEach(p => {
+            grid.innerHTML += `
+                <div class="product-card">
+                    <div class="image-wrapper">
+                        <img src="${p.rasm}" class="product-img" alt="${p.nomi}">
                     </div>
-                `;
-            });
+                    <div class="product-title">${p.nomi}</div>
+                    <div class="price-wrapper">
+                        <div class="old-price">${p.eskiNarxi.toLocaleString()} so'm</div>
+                        <div class="product-price">${p.narxi.toLocaleString()} so'm</div>
+                    </div>
+                    <button class="add-to-cart" onclick="savatchagaQosh('${p.nomi.replace(/'/g, "\\'")}', ${p.narxi})">Savatchaga</button>
+                </div>
+            `;
+        });
 
-            let dynamicActiveNumber = livingCount + Math.floor(Math.random() * 8 + 5);
-            activeCountLabel.innerText = "Faol: " + dynamicActiveNumber;
+        function savatchagaQosh(nomi, narxi) {
+            savatcha.push({ nomi: nomi, narxi: narxi });
+            savatchaniYangila();
         }
 
-        function setupLivePlayers() {
-            activePlayers = [];
-            let shuffled = sampleNames.sort(() => 0.5 - Math.random()).slice(0, 5);
-            shuffled.forEach((name) => {
-                let pBet = Math.floor(Math.random() * 2 + 1) * 2000;
-                let pTarget = parseFloat((1.15 + Math.random() * 3.5).toFixed(2));
-                activePlayers.push({ name: name, bet: pBet, target: pTarget, cashedOut: false });
-            });
-            renderPlayersList();
-        }
-
-        function startRound() {
-            if (isPlaying) return;
-            if (balance < betAmount) { alert("Mablag' yetarli emas!"); return; }
-
-            balance -= betAmount;
-            balanceVal.innerText = balance;
-            isPlaying = true;
-            currentStep = 0;
-            currentMultiplier = 1.00;
-            crashMultiplier = generateCrashPoint();
-
-            generateStonesPattern(); 
-            setupLivePlayers();
-
-            statusText.style.display = 'none';
-            multiplierText.style.display = 'block';
-            multiplierText.innerText = "1.00x";
-            multiplierText.style.color = "white";
+        function savatchaniYangila() {
+            document.getElementById('cart-count').innerText = savatcha.length;
+            let royxatHtml = "";
+            let jamiSumma = 0;
             
-            // Elementlarni boshlang'ich joyiga qaytarish
-            sharkEnemy.style.bottom = "-100px"; 
-            stonesContainer.style.transform = "translateY(0px)";
-            frogPlayer.style.display = "block";
-            frogPlayer.style.bottom = "34px"; 
-            frogPlayer.style.transform = "scale(1)";
-
-            mainBtn.innerText = "CASH OUT (0 UZS)";
-            mainBtn.className = "btn btn-cashout";
-            mainBtn.style.display = "block";
-            mainBtn.setAttribute("onclick", "cashOut()");
-
-            gameLoopInterval = setInterval(() => {
-                let nextStep = currentStep + 1;
-                let nextMultiplier = stoneStepsData[nextStep];
-
-                if (nextMultiplier >= crashMultiplier) {
-                    clearInterval(gameLoopInterval);
-                    endRound(false);
-                    return;
-                }
-
-                currentStep = nextStep;
-                currentMultiplier = nextMultiplier;
-                
-                multiplierText.innerText = currentMultiplier.toFixed(2) + "x";
-                document.getElementById(`stone_${currentStep}`).className = "stone-node active";
-
-                // Sakrash animatsiyasi
-                frogPlayer.style.transform = "scaleY(1.3) scaleX(0.85)";
-                setTimeout(() => { frogPlayer.style.transform = "scale(1)"; }, 150);
-
-                if (currentStep >= 1) {
-                    let offset = currentStep * 78;
-                    stonesContainer.style.transform = `translateY(${offset}px)`;
-                }
-
-                let currentWin = Math.round(betAmount * currentMultiplier);
-                mainBtn.innerText = `CASH OUT (${currentWin} UZS)`;
-
-                let listChanged = false;
-                activePlayers.forEach(p => {
-                    if (!p.cashedOut && currentMultiplier >= p.target) {
-                        p.cashedOut = true;
-                        listChanged = true;
-                    }
-                });
-
-                if (listChanged || Math.random() < 0.3) {
-                    renderPlayersList();
-                }
-
-            }, 850); 
-        }
-
-        function cashOut() { 
-            if (!isPlaying) return; 
-            clearInterval(gameLoopInterval);
-            endRound(true); 
-        }
-
-        function addResultToHistory(finalCoef) {
-            const newItem = document.createElement('div');
-            newItem.innerText = finalCoef.toFixed(2) + "x";
-            newItem.className = finalCoef >= 2.00 ? "history-item coef-high" : "history-item coef-low";
-            historyBox.insertBefore(newItem, historyBox.firstChild);
-            if (historyBox.children.length > 5) historyBox.removeChild(historyBox.lastChild);
-        }
-
-        function endRound(isWin) {
-            isPlaying = false;
-            addResultToHistory(currentMultiplier);
-
-            if (isWin) {
-                let winAmount = Math.round(betAmount * currentMultiplier);
-                balance += winAmount; 
-                balanceVal.innerText = balance; 
-                winVal.innerText = winAmount;
-                multiplierText.style.color = '#2ecc71';
-            } else {
-                // NAHANG HUJUMI EFFEKTI: Nahang pastdan otilib chiqadi
-                let frogCurrentBottom = frogPlayer.style.bottom;
-                sharkEnemy.style.bottom = "25%"; // Markazga otilib chiqadi
-                
-                setTimeout(() => {
-                    frogPlayer.style.transform = "scale(0) rotate(180deg)"; // Baqacha yeyiladi
-                    setTimeout(() => { frogPlayer.style.display = 'none'; }, 150);
-                }, 200);
-                
-                multiplierText.style.display = 'none'; 
-                statusText.style.display = 'block'; 
-                winVal.innerText = 0;
+            savatcha.forEach((item, index) => {
+                royxatHtml += `<div class='cart-item'>${index + 1}. ${item.nomi} - <b>${item.narxi.toLocaleString()} so'm</b></div>`;
+                jamiSumma += item.narxi;
+            });
+            
+            if(savatcha.length === 0) {
+                royxatHtml = "<p style='color:#757575;'>Savatchangiz bo'sh.</p>";
             }
-
-            activeCountLabel.innerText = "Faol: " + Math.floor(Math.random() * 5 + 2);
-
-            setTimeout(() => {
-                mainBtn.innerText = `TIKISH (${betAmount} UZS)`;
-                mainBtn.className = "btn btn-start";
-                mainBtn.setAttribute("onclick", "startRound()");
-            }, 1500); // Nahang animatsiyasi uchun vaqt biroz uzaytirildi
+            
+            document.getElementById('cart-items-list').innerHTML = royxatHtml;
+            document.getElementById('total-sum').innerText = jamiSumma.toLocaleString();
         }
 
-        window.onload = function() {
-            generateStonesPattern();
-            activeCountLabel.innerText = "Faol: " + Math.floor(Math.random() * 6 + 4);
-        };
+        function modalniOch() { document.getElementById('cartModal').style.display = "block"; }
+        function modalniYop() { document.getElementById('cartModal').style.display = "none"; }
+        
+        window.onclick = function(e) {
+            if (e.target == document.getElementById('cartModal')) modalniYop();
+        }
+
+        function rasmiylashtirish() {
+            if(savatcha.length === 0) {
+                alert("Savatchangiz bo'sh!");
+                return;
+            }
+            alert("Sizning buyurtmangiz qabul qilindi. Savdo muvaffaqiyatli yakunlandi!");
+            savatcha = [];
+            savatchaniYangila();
+            modalniYop();
+        }
     </script>
 </body>
 </html>
